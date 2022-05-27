@@ -23,7 +23,7 @@ class CardsScreen extends StatelessWidget {
         actions: [
           Center(
             child: Text(
-              "-R\$${cardsProvider.cards.fold<double>(0, (previousValue, element) => element.getValueByMonth(monthProvider.month) + previousValue)}",
+              "-R\$${(cardsProvider.cards.fold<double>(0, (previousValue, element) => element.getValueByMonth(monthProvider.month) + previousValue)).toStringAsFixed(2)}",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
           )
