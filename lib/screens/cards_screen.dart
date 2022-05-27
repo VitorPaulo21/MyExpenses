@@ -20,6 +20,14 @@ class CardsScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Meus Cartões"),
         centerTitle: true,
+        actions: [
+          Center(
+            child: Text(
+              "-R\$${cardsProvider.cards.fold<double>(0, (previousValue, element) => element.getValueByMonth(monthProvider.month) + previousValue)}",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+          )
+        ],
       ),
       body: cardsProvider.cards.isEmpty
           ? const Center(

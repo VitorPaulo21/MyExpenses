@@ -17,7 +17,7 @@ class CreditCard {
   set value(double value) {
     _value = value;
   }
-
+  double get value => _value;
   double getValueByMonth(String month) {
     if (expenses.containsKey(month)) {
       

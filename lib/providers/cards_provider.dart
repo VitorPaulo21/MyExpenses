@@ -39,13 +39,13 @@ class CardsProvider with ChangeNotifier {
         .map<double>((card) => card.getValueByMonth(month))
         .fold<double>(0, (previousValue, element) => element + previousValue);
   }
-  double cardsTotalValueByDate(DateTime date) {
+  double cardsTotalValueByAdvanceDate(DateTime date, int advanceDay) {
     // check if the date is after salary or advance, save the next salary date if dont have put the 20 day
     String formateDate = DateFormat("MM/yyyy").format(date);
     return _cards
         //implemente here a  method thats load all cards that have the due date after
         // advance dont appears here, and calculate the value
-        // .where((card) => card.)
+        .where((card) => card.dueDateDay < advanceDay)
         .map<double>((card) => card.getValueByMonth(formateDate))
         .fold<double>(0, (previousValue, element) => element + previousValue);
   }

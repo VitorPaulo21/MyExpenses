@@ -48,45 +48,71 @@ class ExpensesProvider with ChangeNotifier {
         .format(DateTime(date.year, date.month + 1, date.day));
     double monthSalaryValue =
         salaryProvider!.getTotalSalaryValueByMonth(formateDate);
-    double monthCardValue = cardsProvider!.cardsTotalValueByMonth(formateDate);
-    double dayCardsValue = 0;
-    
+    int advanceDay = 20;
+    double expensesUntillAdvance = 0;
+    double monthExpenseResult = 0;
+    double advancesValues = 0;
+
     //Se eu tenho um salario esse mes
     if (salaryProvider!.salaryies.containsKey(formateDate)) {
-      //verifica se todas as datas de recebimento de salario desse mes estao antes da data fornecida
-      if (salaryProvider!.salaryies[formateDate]!.every((salary) =>
-          DateTime(date.year, date.month, salary.receiptDate).isAfter(date))) {
-        //se sim verifica se mes que vem tem uma data com salario pra que se tiver verifique se la tem adiantamento
-        if (salaryProvider!.salaryies.containsKey(advanceDate)) {
-          //verifica se algum salario do mes que vem possui adiantamento maior que 0 e que a data seja igual a fornecida
-          if (salaryProvider!.salaryies[advanceDate]!.any((salary) =>
-              salary.advance > 0 && salary.advanceDate == date.day)) {
-            return salaryProvider!.salaryies[advanceDate]!
-                .where((salary) =>
-                    salary.advance > 0 && salary.advanceDate == date.day)
-                .fold<double>(
+      //verifica se mes que vem tem uma data com salario pra que se tiver verifique se la tem adiantamento
+      if (salaryProvider!.salaryies.containsKey(advanceDate)) {
+        //verifica se algum salario do mes que vem possui adiantamento maior que 0
+
+        if (salaryProvider!.salaryies[advanceDate]!
+            .any((salary) => salary.advance > 0)) {
+          advanceDay =
+              salaryProvider!.salaryies[advanceDate]!.first.advanceDate ?? 20;
+          expensesUntillAdvance =
+              cardsProvider!.cardsTotalValueByAdvanceDate(date, advanceDay);
+          monthExpenseResult = monthSalaryValue - expensesUntillAdvance;
+          advancesValues = salaryProvider!.salaryies[advanceDate]!.fold<double>(
                   0,
-                  (previousValue, salary) => salary.advance + previousValue,
-                );
+                  (previousValue, element) => element.advance + previousValue);
+          //verifica se a data de adiantamento do mes que vem é igual a fornecida
+          if (advanceDay == date.day) {
+            //tem salario mes que vem
+            //tem adiantamento mes que vem
+            //e o valor é maior que zero
+            //e este dia é igual o dia do adiantamento mes que vem
+
+            //retornar o resto das minhas despesas menos o meu adiantamento
+            return advancesValues -
+                (monthExpenseResult < 0 ? monthExpenseResult.abs() : 0) -
+                (cardsProvider!.cardsTotalValueByMonth(formateDate) -
+                    expensesUntillAdvance);
           } else {
-            //caso contrario cria um valor no dia vinte referente ao que sobrou do salario desse mes menos as despesas
-            if (date.day ==
-                salaryProvider!.salaryies[advanceDate]!.first.advanceDate) {
-              return 0;
-            } else {
-              return 0;
-            }
+            //tem salario mes que vem
+            //tem adiantamento mes que vem
+            //e o valor é maior que zero
+            return monthExpenseResult;
           }
         } else {
-          //caso contrario cria um valor no dia vinte referente ao que sobrou do salario desse mes menos as despesas
-          return 0;
+          //caso contrario cria um valor no dia vinte referente ao que sobrou do salario desse mes menos as despesas porque nao tem adiantamento mes que vem
+          if (date.day ==
+              advanceDate) {
+            expensesUntillAdvance =
+                cardsProvider!.cardsTotalValueByAdvanceDate(date, advanceDay);
+            return expensesUntillAdvance < 0 ? expensesUntillAdvance : 0;
+          } else {
+            return monthSalaryValue -
+                cardsProvider!.cardsTotalValueByMonth(formateDate);
+          }
         }
       } else {
-        return 0;
-
+        //caso nao tenha salario mes que vem cria um valor no dia vinte referente ao que sobrou do salario desse mes menos as despesas
+        if (date.day == advanceDate) {
+          expensesUntillAdvance =
+              cardsProvider!.cardsTotalValueByAdvanceDate(date, advanceDay);
+          return expensesUntillAdvance < 0 ? expensesUntillAdvance : 0;
+        } else {
+          return monthSalaryValue -
+              cardsProvider!.cardsTotalValueByMonth(formateDate);
+        }
       }
     } else {
-      return 0;
+      return cardsProvider!.cardsTotalValueByMonth(formateDate);
+      
     }
   }
 
