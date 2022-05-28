@@ -1,32 +1,31 @@
+import 'package:my_expenses/models/advance.dart';
+import 'package:my_expenses/models/entry.dart';
+
 class Salary {
-  double _value;
-  int receiptDate;
-  double _advance;
-  int? advanceDate;
-  bool fixDate;
+  List<Entry> entryList = [];
+  List<Advance> advanceList = [];
+  List<Advance> debitAdvanceList = [];
+  DateTime date;
 
-  Salary({
-    required double value,
-    required this.receiptDate,
-    double advance = 0,
-    this.advanceDate,
-      bool this.fixDate = false
-  })
-      : _advance = advance,
-        _value = value;
+  Salary(DateTime this.date);
 
-  double get advance {
-    return _advance;
+  double getAllAdvancesValue() {
+    return advanceList.fold<double>(
+        0, (previousValue, advance) => advance.getAllValue() + previousValue);
   }
 
-  void setAdvance({required double value, required int advanceDate}) {
-    _advance = value;
-    this.advanceDate = advanceDate;
+  double getAllDebitAdvancesValue() {
+    return debitAdvanceList.fold<double>(
+        0, (previousValue, advance) => advance.getAllValue() + previousValue);
   }
 
-  double get value {
-    return _value - _advance;
+  double getAllEntryValue() {
+    return entryList.fold<double>(
+        0, (previousValue, entry) => entry.value + previousValue);
   }
 
-  set value(double value) => _value = value;
+  double getLiquidsalaryValue() {
+    return (getAllEntryValue() + getAllAdvancesValue()) -
+        getAllDebitAdvancesValue();
+  }
 }

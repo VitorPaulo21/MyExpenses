@@ -75,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     focusedDay = date;
                   });
                   Provider.of<MonthProvider>(context, listen: false).month =
-                      DateFormat("MM/yyyy").format(date);
+                      date.month;
                       
                 },
                 calendarBuilders: CalendarBuilders<Expense>(
